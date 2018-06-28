@@ -2,7 +2,6 @@
 namespace asbamboo\di;
 
 use asbamboo\di\exception\NotFoundException;
-use phpDocumentor\Reflection\Types\Mixed_;
 
 /**
  * 通过这个容器管理系统内各个服务service
