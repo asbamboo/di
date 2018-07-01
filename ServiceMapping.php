@@ -58,7 +58,7 @@ class ServiceMapping implements ServiceMappingInterface
      */
     public function getInitParams(): array
     {
-        return $this->init_params;
+        return (array) $this->init_params;
     }
 
     /**

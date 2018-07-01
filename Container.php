@@ -40,7 +40,7 @@ class Container implements ContainerInterface
          * 服务不存在
          */
         if($this->has($id) == false){
-            throw new NotFoundException('找不到服务。');
+            throw new NotFoundException(sprintf('找不到服务。[%s]', $id));
         }
 
         /*
@@ -71,7 +71,7 @@ class Container implements ContainerInterface
                 }
             }
             ksort($ordered_init_params);
-
+            
             $this->services[$id]    = new $class(...$ordered_init_params);
             $this->ServiceMappings->remove($id);
 
@@ -104,7 +104,7 @@ class Container implements ContainerInterface
      */
     private function filterServiceParamValue($value)
     {
-        if(strncmp($value, '@', 1) === 0){
+        if(is_string($value) && strncmp($value, '@', 1) === 0){
             $server_id  = substr($value, 1);
             $value = $this->get($server_id);
         }

@@ -21,7 +21,7 @@ class ContainerTest extends TestCase
      * @return \asbamboo\di\Container
      */
     public function testGet()
-    {
+    {        
         $option             = ['id' => 'id', 'class' => Service1::class, 'init_params' => ['prop2' => '1', '2']];
         $ServiceMapping     = new ServiceMapping($option);
         $ServiceMappings    = new ServiceMappingCollection();
