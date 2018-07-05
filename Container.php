@@ -58,32 +58,46 @@ class Container implements ContainerInterface
             // constructor方法的参数按照上一条参数注入方式没有匹配到，那么继续从$init_params剩下的参数中，按照先后顺序注入。
             // constructor方法的参数按照上一条参数注入方式没有匹配到，并且已经没有$init_params可用，那么这个参数的值等于null
             $ordered_init_params    = [];
-            foreach($ReflectionClass->getConstructor()->getParameters() AS $index => $ReflectionParameter){
+            $ReflectionParameters   = $ReflectionClass->getConstructor() ? $ReflectionClass->getConstructor()->getParameters() : [];
+            foreach($ReflectionParameters AS $index => $ReflectionParameter){
                 $name           = $ReflectionParameter->getName();
                 if(isset($init_params[$name])){
                     $ordered_init_params[$index]    = $this->filterServiceParamValue($init_params[$name]);
                     unset($init_params[$name]);
                 }
             }
-            foreach($ReflectionClass->getConstructor()->getParameters() AS $index => $ReflectionParameter){
+            foreach($ReflectionParameters AS $index => $ReflectionParameter){
                 if(!isset( $ordered_init_params[$index] )){
                     $ordered_init_params[$index]    = $this->filterServiceParamValue(array_shift($init_params));
                 }
             }
             ksort($ordered_init_params);
-            
-            $this->services[$id]    = new $class(...$ordered_init_params);
+
             $this->ServiceMappings->remove($id);
 
-            if(method_exists($this->services[$id], 'setContainer')){
-                $this->services[$id]->setContainer($this);
-            }
+            $this->set($id, new $class(...$ordered_init_params));
         }
 
         /*
          * return service
          */
         return $this->services[$id];
+    }
+
+    /**
+     *
+     * @param string $id
+     * @param object $service
+     */
+    public function set(string $id, object $service)
+    {
+        $this->services[$id]    = $service;
+
+        if(method_exists($this->services[$id], 'setContainer')){
+            $this->services[$id]->setContainer($this);
+        }
+
+        return $this;
     }
 
     /**
@@ -94,12 +108,12 @@ class Container implements ContainerInterface
     {
         return isset($this->services[$id]) || $this->ServiceMappings->has($id);
     }
-    
+
     /**
      * service 参数的每个值的过滤器
-     * 
+     *
      * 如果参数的值是另一个service，那么该值是'@' + $service_id, 本方法将这种参数转换为service object
-     * 
+     *
      * @return $value 过滤以后的 $value
      */
     private function filterServiceParamValue($value)
