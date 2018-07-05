@@ -66,15 +66,16 @@ class Container implements ContainerInterface
                     unset($init_params[$name]);
                 }
             }
-            foreach($ReflectionParameters AS $index => $ReflectionParameter){
-                if(!isset( $ordered_init_params[$index] )){
-                    $ordered_init_params[$index]    = $this->filterServiceParamValue(array_shift($init_params));
+            if(!empty( $init_params )){
+                foreach($ReflectionParameters AS $index => $ReflectionParameter){
+                    if(!isset( $ordered_init_params[$index] )){
+                        $ordered_init_params[$index]    = $this->filterServiceParamValue(array_shift($init_params));
+                    }
                 }
             }
             ksort($ordered_init_params);
 
             $this->ServiceMappings->remove($id);
-
             $this->set($id, new $class(...$ordered_init_params));
         }
 
