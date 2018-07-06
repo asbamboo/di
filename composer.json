@@ -1,0 +1,14 @@
+{
+    "name": "asbamboo/di",
+    "description": "依赖注入模块",
+    "type": "library",
+    "license": "BSD",
+    "authors": [
+        {
+            "name": "李春寅",
+            "email": "licy2013@aliyun.com"
+        }
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
