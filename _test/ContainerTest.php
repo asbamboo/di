@@ -44,7 +44,7 @@ class ContainerTest extends TestCase
         $option             = ['id' => 'id', 'class' => Service1::class, 'init_params' => ['prop2' => '1', '2']];
         $ServiceMapping1    = new ServiceMapping($option);
         
-        $option             = ['id' => 'id2', 'class' => Service1::class, 'init_params' => ['prop2' => '@id']];
+        $option             = ['id' => 'id2', 'class' => Service1::class, 'init_params' => ['prop2' => '@id', '0']];
         $ServiceMapping2    = new ServiceMapping($option);
         
         $ServiceMappings    = new ServiceMappingCollection();
