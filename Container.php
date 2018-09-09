@@ -173,7 +173,6 @@ class Container implements ContainerInterface
                             $test_class         = substr($test_class, 0, -9);
                         }
                         if(class_exists($test_class)){
-                            $this->ServiceMappings->add(new ServiceMapping(['class' => $test_class]));
                             $ordered_init_params[$index]    = $this->get($test_class);
                         }
                     }
@@ -215,7 +214,15 @@ class Container implements ContainerInterface
      */
     public function has(string $id) : bool
     {
-        return isset($this->services[$id]) || $this->ServiceMappings->has($id);
+        if(isset($this->services[$id])){
+            return true;
+        }else if($this->ServiceMappings->has($id)){
+            return true;
+        }else if(class_exists($id)){
+            $this->ServiceMappings->add(new ServiceMapping(['class' => $id]));
+            return true;
+        }
+        return false;
     }
 
     /**
