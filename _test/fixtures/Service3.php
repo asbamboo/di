@@ -4,22 +4,17 @@ namespace asbamboo\di\_test\fixtures;
 use asbamboo\di\ContainerAwareTrait;
 
 /**
- * 测试注册服务时设置参数
- *
  * @author 李春寅 <licy2013@aliyun.com>
  * @since 2018年3月15日
  */
-class Service1
+class Service3
 {
     use ContainerAwareTrait;
 
-    public $prop1;
+    public $Service4;
 
-    public $prop2;
-
-    public function __construct($prop1, $prop2)
+    public function __construct(Service4 $Service4 = null)
     {
-        $this->prop1  = $prop1;
-        $this->prop2  = $prop2;
+        $this->Service4  = $Service4;
     }
 }

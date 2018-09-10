@@ -11,4 +11,12 @@ use asbamboo\di\psr\PsrContainerInterface;
  */
 interface ContainerInterface extends PsrContainerInterface
 {
+    /**
+     * 设置一个服务
+     *
+     * @param string $id 服务的唯一表示符
+     * @param object $service 服务
+     * @return ContainerInterface
+     */
+    public function set(string $id, object $service) : ContainerInterface;
 }
