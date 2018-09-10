@@ -9,6 +9,13 @@
             "email": "licy2013@aliyun.com"
         }
     ],
+    "require": {
+        "php": "^7.2",
+        "asbamboo/autoload": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.2"
+    },
     "prefer-stable": true,
     "minimum-stability": "dev"
 }
