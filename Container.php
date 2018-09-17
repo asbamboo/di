@@ -79,9 +79,19 @@ class Container implements ContainerInterface
                 // 类在从来没有注册过服务时，允许自动注册
                 $this->ServiceMappings->add(new ServiceMapping(['class' => $id]));
             }elseif(interface_exists($id)){
-                $interface_str  = substr($id, -9);
-                $class          = strcasecmp($interface_str, 'Interface') === 0 ? substr($id, 0, -9) : $id;
-                $this->ServiceMappings->add(new ServiceMapping(['id' => $id, 'class' => $class]));
+                // 类在从来没有注册过服务时，允许自动注册
+                $isset_service_mapping  = false;
+                foreach($this->ServiceMappings->getIterator() AS $ServiceMapping){
+                    if(in_array($id, class_implements($ServiceMapping->getClass()))){
+                        $id                     = $ServiceMapping->getId();
+                        $isset_service_mapping  = true;
+                    }
+                }
+                if($isset_service_mapping == false){
+                    $interface_str  = substr($id, -9);
+                    $class          = strcasecmp($interface_str, 'Interface') === 0 ? substr($id, 0, -9) : $id;
+                    $this->ServiceMappings->add(new ServiceMapping(['id' => $id, 'class' => $class]));
+                }
             }else{
                 throw new NotFoundException(sprintf('找不到服务。[%s]', $id));
             }
@@ -139,7 +149,7 @@ class Container implements ContainerInterface
                     $test_class_name    = $ReflectionParameterClass->getName();
                     $from_initparams    = [];
                     foreach($init_params AS $key => $init_param){
-                        $init_param = $this->filterServiceParamValue($init_params[$name]);
+                        $init_param = $this->filterServiceParamValue($init_param);
                         if($init_param instanceof $test_class_name){
                             $from_initparams[$key]  = $init_param;
                         }
