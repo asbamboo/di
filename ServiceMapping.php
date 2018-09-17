@@ -47,7 +47,7 @@ class ServiceMapping implements ServiceMappingInterface
     public function getClass(): string
     {
         if(empty($this->class)){
-            throw new ServiceMappingException('容器[container]的服务配置信息，必须设置类名[class name]。');
+            throw new ServiceMappingException(sprintf('容器[container]的服务配置信息，必须设置类名[class name][%s]。', $this->id));
         }
         return $this->class;
     }

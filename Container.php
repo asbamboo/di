@@ -67,11 +67,34 @@ class Container implements ContainerInterface
      */
     public function get(string $id) : object
     {
+
         /**
          * 服务不存在
          */
         if($this->has($id) == false){
-            throw new NotFoundException(sprintf('找不到服务。[%s]', $id));
+            if(isset($this->class_to_service_mapping[$id]) && count($this->class_to_service_mapping[$id]) == 1){
+                // 在一个类只被注册为服务一次的情况下，参数$id可以传递类名字，这里将类名字转换成id
+                $id = current($this->class_to_service_mapping[$id]);
+            }elseif(class_exists($id)){
+                // 类在从来没有注册过服务时，允许自动注册
+                $this->ServiceMappings->add(new ServiceMapping(['class' => $id]));
+            }elseif(interface_exists($id)){
+                // 类在从来没有注册过服务时，允许自动注册
+                $isset_service_mapping  = false;
+                foreach($this->ServiceMappings->getIterator() AS $ServiceMapping){
+                    if(in_array($id, class_implements($ServiceMapping->getClass()))){
+                        $id                     = $ServiceMapping->getId();
+                        $isset_service_mapping  = true;
+                    }
+                }
+                if($isset_service_mapping == false){
+                    $interface_str  = substr($id, -9);
+                    $class          = strcasecmp($interface_str, 'Interface') === 0 ? substr($id, 0, -9) : $id;
+                    $this->ServiceMappings->add(new ServiceMapping(['id' => $id, 'class' => $class]));
+                }
+            }else{
+                throw new NotFoundException(sprintf('找不到服务。[%s]', $id));
+            }
         }
 
         /**
@@ -126,7 +149,7 @@ class Container implements ContainerInterface
                     $test_class_name    = $ReflectionParameterClass->getName();
                     $from_initparams    = [];
                     foreach($init_params AS $key => $init_param){
-                        $init_param = $this->filterServiceParamValue($init_params[$name]);
+                        $init_param = $this->filterServiceParamValue($init_param);
                         if($init_param instanceof $test_class_name){
                             $from_initparams[$key]  = $init_param;
                         }
@@ -148,7 +171,7 @@ class Container implements ContainerInterface
                         continue;
                     }
                     if(count($this->class_to_service_mapping[$test_class_name]) > 1){
-                        throw new CannotInjectParamToServiceException('无法实现容器内服务参数的自动注入, 因为有两个类型一样的服务。');
+                        throw new CannotInjectParamToServiceException(sprintf('无法实现容器内服务参数的自动注入, 因为有两个类型一样的服务。[%s]', $test_class_name));
                     }
                     $auto_inject_service_id         = current($this->class_to_service_mapping[$test_class_name]);
                     $ordered_init_params[$index]    = $this->get($auto_inject_service_id);
@@ -217,9 +240,6 @@ class Container implements ContainerInterface
         if(isset($this->services[$id])){
             return true;
         }else if($this->ServiceMappings->has($id)){
-            return true;
-        }else if(class_exists($id)){
-            $this->ServiceMappings->add(new ServiceMapping(['class' => $id]));
             return true;
         }
         return false;
