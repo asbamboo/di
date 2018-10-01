@@ -155,6 +155,19 @@ class Container implements ContainerInterface
                         }
                     }
                     if(count( $from_initparams ) > 1){
+//                      这里不再抛出异常的原因是controller的 __construct(TestInterface ...$test)
+//                      这种情况下这个构造方法所有的参数都应该是TestInterface类型，而且还要传递多个参数，init_params参数还不能使用test作为参数的key
+//                      这种情况发生在asbamboo/demo中 config "CheckerCollection"
+                        if($ReflectionParameter->isVariadic()){
+                            foreach($from_initparams AS $key => $from_initparam){
+                                $ordered_init_params[$index]    = $from_initparam;
+                                $index                          = $index+1;
+                                unset($init_params[$key]);
+                                $seted_params_count++;
+                            }
+                            $index  = $index-1;
+                            continue;
+                        }
                         throw new CannotInjectParamToServiceException('无法实现容器内服务参数的自动注入, 因为设置的参数中有两个类型一样的变量。');
                     }
                     foreach($from_initparams AS $key => $from_initparam){
@@ -189,14 +202,18 @@ class Container implements ContainerInterface
             if($full_params_count != $seted_params_count){
                 foreach($ReflectionParameters AS $index => $ReflectionParameter){
                     $ReflectionParameterClass   = $ReflectionParameter->getClass();
-                    if(!isset( $ordered_init_params[$index] ) && !is_null($ReflectionParameterClass)){
-                        $test_class             = $ReflectionParameterClass->getName();
-                        $test_interface_string  = strtolower(substr($test_class, -9));
-                        if($test_interface_string == 'interface'){
-                            $test_class         = substr($test_class, 0, -9);
-                        }
-                        if(class_exists($test_class)){
-                            $ordered_init_params[$index]    = $this->get($test_class);
+                    if(is_null($ReflectionParameterClass)){
+                        $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                    }else{
+                        if(!isset( $ordered_init_params[$index] )){
+                            $test_class             = $ReflectionParameterClass->getName();
+                            $test_interface_string  = strtolower(substr($test_class, -9));
+                            if($test_interface_string == 'interface'){
+                                $test_class         = substr($test_class, 0, -9);
+                            }
+                            if(class_exists($test_class)){
+                                $ordered_init_params[$index]    = $this->get($test_class);
+                            }
                         }
                     }
                 }
