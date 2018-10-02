@@ -204,7 +204,9 @@ class Container implements ContainerInterface
                     $ReflectionParameterClass   = $ReflectionParameter->getClass();
                     if(!isset( $ordered_init_params[$index] )){
                         if(is_null($ReflectionParameterClass)){
-                            $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                            if($ReflectionParameter->isDefaultValueAvailable()){
+                                $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                            }
                         }else{
                             $test_class             = $ReflectionParameterClass->getName();
                             $test_interface_string  = strtolower(substr($test_class, -9));
