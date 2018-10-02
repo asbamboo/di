@@ -204,7 +204,9 @@ class Container implements ContainerInterface
                     $ReflectionParameterClass   = $ReflectionParameter->getClass();
                     if(!isset( $ordered_init_params[$index] )){
                         if(is_null($ReflectionParameterClass)){
-                            $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                            if($ReflectionParameter->isDefaultValueAvailable()){
+                                $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                            }
                         }else{
                             $test_class             = $ReflectionParameterClass->getName();
                             $test_interface_string  = strtolower(substr($test_class, -9));
@@ -219,6 +221,20 @@ class Container implements ContainerInterface
                 }
             }
             ksort($ordered_init_params);
+
+            /*
+             * 将配置项里面剩余的参数全部添加到构造方法的参数列表
+             * 适用于 __construct(...$params)
+             */
+            if(!empty( $init_params )){
+                foreach($init_params AS $key => $init_param){
+                    $ordered_init_params[]  = $init_param;
+                    unset($init_params[$key]);
+                }
+            }
+
+            $this->ServiceMappings->remove($id);
+            $this->set($id, new $class(...$ordered_init_params));
 
             $this->ServiceMappings->remove($id);
             $this->set($id, new $class(...$ordered_init_params));
