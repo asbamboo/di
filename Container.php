@@ -202,10 +202,10 @@ class Container implements ContainerInterface
             if($full_params_count != $seted_params_count){
                 foreach($ReflectionParameters AS $index => $ReflectionParameter){
                     $ReflectionParameterClass   = $ReflectionParameter->getClass();
-                    if(is_null($ReflectionParameterClass)){
-                        $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
-                    }else{
-                        if(!isset( $ordered_init_params[$index] )){
+                    if(!isset( $ordered_init_params[$index] )){
+                        if(is_null($ReflectionParameterClass)){
+                            $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
+                        }else{
                             $test_class             = $ReflectionParameterClass->getName();
                             $test_interface_string  = strtolower(substr($test_class, -9));
                             if($test_interface_string == 'interface'){
