@@ -208,13 +208,14 @@ class Container implements ContainerInterface
                                 $ordered_init_params[$index]    = $ReflectionParameter->getDefaultValue();
                             }
                         }else{
-                            $test_class             = $ReflectionParameterClass->getName();
-                            $test_interface_string  = strtolower(substr($test_class, -9));
+                            $class_name             = $ReflectionParameterClass->getName();
+                            $test_class             = $class_name;
+                            $test_interface_string  = strtolower(substr($class_name, -9));
                             if($test_interface_string == 'interface'){
-                                $test_class         = substr($test_class, 0, -9);
+                                $test_class         = substr($class_name, 0, -9);
                             }
                             if(class_exists($test_class)){
-                                $ordered_init_params[$index]    = $this->get($test_class);
+                                $ordered_init_params[$index]    = $this->get($class_name);
                             }
                         }
                     }
@@ -232,9 +233,6 @@ class Container implements ContainerInterface
                     unset($init_params[$key]);
                 }
             }
-
-            $this->ServiceMappings->remove($id);
-            $this->set($id, new $class(...$ordered_init_params));
 
             $this->ServiceMappings->remove($id);
             $this->set($id, new $class(...$ordered_init_params));
