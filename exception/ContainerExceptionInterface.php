@@ -1,7 +1,7 @@
 <?php
 namespace asbamboo\di\exception;
 
-use asbamboo\di\psr\exception\PsrContainerExceptionInterface;
+use Psr\Container\ContainerExceptionInterface AS PsrContainerExceptionInterface;
 
 /**
  * 继承遵守psr规则的ContainerInterface，并在此基础上扩展

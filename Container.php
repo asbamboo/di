@@ -62,10 +62,11 @@ class Container implements ContainerInterface
     }
 
     /**
+     *
      * {@inheritDoc}
-     * @see \asbamboo\di\ContainerInterface::get()
+     * @see \Psr\Container\ContainerInterface::get()
      */
-    public function get(string $id) : object
+    public function get(/*string*/$id)/* : object*/
     {
 
         /**
@@ -263,10 +264,11 @@ class Container implements ContainerInterface
     }
 
     /**
+     *
      * {@inheritDoc}
-     * @see \asbamboo\di\ContainerInterface::has()
+     * @see \Psr\Container\ContainerInterface::has()
      */
-    public function has(string $id) : bool
+    public function has(/*string*/$id)/*: bool*/
     {
         if(isset($this->services[$id])){
             return true;
