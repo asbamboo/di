@@ -1,7 +1,7 @@
 <?php
 namespace asbamboo\di;
 
-use asbamboo\di\psr\PsrContainerInterface;
+use Psr\Container\ContainerInterface AS PsrContainerInterface;
 
 /**
  * 继承遵守psr规则的ContainerInterface，并在此基础上扩展
